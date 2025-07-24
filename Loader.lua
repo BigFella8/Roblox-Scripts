@@ -37,7 +37,7 @@ logo.Parent = screenGui
 
 local fill = Instance.new("Frame")
 fill.Size = UDim2.new(0, 0, 1, 0)
-fill.BackgroundColor3 = Color3.fromRGB(128, 0, 128) -- Purple color
+fill.BackgroundColor3 = Color3.fromRGB(128, 0, 128)
 fill.BorderSizePixel = 0
 local fillCorner = Instance.new("UICorner")
 fillCorner.CornerRadius = UDim.new(0, 12)
@@ -47,7 +47,7 @@ fill.Parent = frame
 local textLabel = Instance.new("TextLabel")
 textLabel.Size = UDim2.new(1, 0, 1, 0)
 textLabel.BackgroundTransparency = 1
-textLabel.TextColor3 = Color3.fromRGB(128, 0, 128) -- Purple color
+textLabel.TextColor3 = Color3.fromRGB(128, 0, 128)
 textLabel.Text = "0%"
 textLabel.Font = Enum.Font.GothamBold
 textLabel.TextSize = 24
@@ -58,7 +58,7 @@ textLabel.Parent = frame
 -- Add skip button
 local skipButton = Instance.new("TextButton")
 skipButton.Size = UDim2.new(0, 100, 0, 30)
-skipButton.Position = UDim2.new(0.5, -50, 0.5, 20) -- Below the loading bar
+skipButton.Position = UDim2.new(0.5, -50, 0.5, 20)
 skipButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 skipButton.Text = "Skip"
 skipButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -69,115 +69,81 @@ skipCorner.CornerRadius = UDim.new(0, 8)
 skipCorner.Parent = skipButton
 skipButton.Parent = screenGui
 
--- Audio handling - executor-specific approach
+-- Audio handling - starts immediately
 local sound = Instance.new("Sound")
 sound.Parent = screenGui
 sound.Name = "LoadingSound"
-sound.Volume = 25.0 -- Set reasonable volume
+sound.Volume = 25.0
+sound.Looped = false
 
-local function loadAudio()
-    -- Method 2: Base64 audio (executor-specific)
-    if getsynasset then -- Synapse X
-        writefile("loading_audio.mp3", game:HttpGet("https://files.catbox.moe/fldrsa.mp3"))
-        sound.SoundId = getsynasset("loading_audio.mp3")
-    elseif getcustomasset then -- Other executors
-        writefile("loading_audio.mp3", game:HttpGet("https://files.catbox.moe/fldrsa.mp3"))
-        sound.SoundId = getcustomasset("loading_audio.mp3")
-    elseif deltaasset then -- Placeholder for Delta iOS Executor function
-        writefile("loading_audio.mp3", game:HttpGet("https://files.catbox.moe/fldrsa.mp3"))
-        sound.SoundId = deltaasset("loading_audio.mp3")
-    end
-
-    -- Wait for sound to load with retry
-    local maxWait = 10 -- Maximum wait time in seconds
-    local startTime = tick()
-    while tick() - startTime < maxWait do
-        if pcall(function() return sound.IsLoaded end) and sound.IsLoaded then
-            return true
-        end
+-- Preload audio in parallel with UI setup
+local audioLoaded = false
+local audioThread = task.spawn(function()
+    -- Try direct URL first (fastest)
+    sound.SoundId = "https://files.catbox.moe/fldrsa.mp3"
+    
+    -- Wait for load with timeout
+    local startTime = os.clock()
+    while os.clock() - startTime < 5 and not sound.IsLoaded do
         task.wait(0.1)
     end
-    return false
-end
-
--- Play sound and start loading bar
-spawn(function()
-    local success = pcall(loadAudio)
-    if success and loadAudio() then
-        print("Audio loaded successfully")
+    
+    -- If not loaded, try executor methods
+    if not sound.IsLoaded then
+        if getsynasset then
+            writefile("loading_audio.mp3", game:HttpGet("https://files.catbox.moe/fldrsa.mp3"))
+            sound.SoundId = getsynasset("loading_audio.mp3")
+        elseif getcustomasset then
+            writefile("loading_audio.mp3", game:HttpGet("https://files.catbox.moe/fldrsa.mp3"))
+            sound.SoundId = getcustomasset("loading_audio.mp3")
+        end
+        
+        -- Wait again
+        startTime = os.clock()
+        while os.clock() - startTime < 5 and not sound.IsLoaded do
+            task.wait(0.1)
+        end
+    end
+    
+    audioLoaded = sound.IsLoaded
+    if audioLoaded then
         sound:Play()
-        
-        -- Debug sound state
-        print("Sound state:", {
-            IsLoaded = sound.IsLoaded,
-            Playing = sound.Playing,
-            TimeLength = sound.TimeLength
-        })
-        
-        -- Start loading bar animation (5 seconds)
-        local tweenInfo = TweenInfo.new(5, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
-        local fillTween = TweenService:Create(fill, tweenInfo, { Size = UDim2.new(1, 0, 1, 0) })
-        fillTween:Play()
-        
-        local function updatePercentage()
-            local progress = fill.Size.X.Scale
-            textLabel.Text = math.floor(progress * 100) .. "%"
-        end
-        fill:GetPropertyChangedSignal("Size"):Connect(updatePercentage)
-        
-        -- Wait for loading bar to complete, then fade out GUI
-        fillTween.Completed:Connect(function()
-            local fadeTweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.In)
-            local fadeFrame = TweenService:Create(frame, fadeTweenInfo, { BackgroundTransparency = 1 })
-            local fadeFill = TweenService:Create(fill, fadeTweenInfo, { BackgroundTransparency = 1 })
-            local fadeText = TweenService:Create(textLabel, fadeTweenInfo, {
-                TextTransparency = 1,
-                TextStrokeTransparency = 1
-            })
-            local fadeBlur = TweenService:Create(blur, fadeTweenInfo, { Size = 0 })
-            local fadeLogo = TweenService:Create(logo, fadeTweenInfo, { TextTransparency = 1 })
-            fadeFrame:Play()
-            fadeFill:Play()
-            fadeText:Play()
-            fadeBlur:Play()
-            fadeLogo:Play()
-            fadeFrame.Completed:Connect(function()
-                frame:Destroy()
-                fill:Destroy()
-                textLabel:Destroy()
-                blur:Destroy()
-                logo:Destroy()
-                skipButton:Destroy()
-                print("Loading screen destroyed.")
-            end)
-        end)
-        
-        -- Keep music playing for 15 seconds
-        task.wait(20)
-        if sound.Playing then
-            sound:Stop()
-        end
+        print("Audio playing")
     else
         warn("Failed to load audio")
     end
 end)
 
--- Skip button functionality
-skipButton.MouseButton1Click:Connect(function()
-    local fadeTweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine, Enum.EasingDirection.In)
-    local fadeFrame = TweenService:Create(frame, fadeTweenInfo, { BackgroundTransparency = 1 })
-    local fadeFill = TweenService:Create(fill, fadeTweenInfo, { BackgroundTransparency = 1 })
+-- Start loading bar animation (5 seconds)
+local fillTween = TweenService:Create(fill, TweenInfo.new(5, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)})
+fillTween:Play()
+
+-- Update percentage text
+fill:GetPropertyChangedSignal("Size"):Connect(function()
+    textLabel.Text = math.floor(fill.Size.X.Scale * 100) .. "%"
+end)
+
+-- Fade out UI after 5 seconds
+task.delay(5, function()
+    local fadeTweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine)
+    
+    local fadeFrame = TweenService:Create(frame, fadeTweenInfo, {BackgroundTransparency = 1})
+    local fadeFill = TweenService:Create(fill, fadeTweenInfo, {BackgroundTransparency = 1})
     local fadeText = TweenService:Create(textLabel, fadeTweenInfo, {
         TextTransparency = 1,
         TextStrokeTransparency = 1
     })
-    local fadeBlur = TweenService:Create(blur, fadeTweenInfo, { Size = 0 })
-    local fadeLogo = TweenService:Create(logo, fadeTweenInfo, { TextTransparency = 1 })
+    local fadeBlur = TweenService:Create(blur, fadeTweenInfo, {Size = 0})
+    local fadeLogo = TweenService:Create(logo, fadeTweenInfo, {TextTransparency = 1})
+    local fadeSkip = TweenService:Create(skipButton, fadeTweenInfo, {BackgroundTransparency = 1, TextTransparency = 1})
+    
     fadeFrame:Play()
     fadeFill:Play()
     fadeText:Play()
     fadeBlur:Play()
     fadeLogo:Play()
+    fadeSkip:Play()
+    
     fadeFrame.Completed:Connect(function()
         frame:Destroy()
         fill:Destroy()
@@ -185,8 +151,53 @@ skipButton.MouseButton1Click:Connect(function()
         blur:Destroy()
         logo:Destroy()
         skipButton:Destroy()
-        print("Loading screen skipped.")
+        print("UI destroyed")
     end)
+end)
+
+-- Stop audio after 20 seconds total
+task.delay(20, function()
+    if sound and sound.Playing then
+        sound:Stop()
+    end
+    if sound then
+        sound:Destroy()
+    end
+    print("Audio stopped")
+end)
+
+-- Skip button functionality
+skipButton.MouseButton1Click:Connect(function()
+    local fadeTweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Sine)
+    
+    local fadeFrame = TweenService:Create(frame, fadeTweenInfo, {BackgroundTransparency = 1})
+    local fadeFill = TweenService:Create(fill, fadeTweenInfo, {BackgroundTransparency = 1})
+    local fadeText = TweenService:Create(textLabel, fadeTweenInfo, {
+        TextTransparency = 1,
+        TextStrokeTransparency = 1
+    })
+    local fadeBlur = TweenService:Create(blur, fadeTweenInfo, {Size = 0})
+    local fadeLogo = TweenService:Create(logo, fadeTweenInfo, {TextTransparency = 1})
+    local fadeSkip = TweenService:Create(skipButton, fadeTweenInfo, {BackgroundTransparency = 1, TextTransparency = 1})
+    
+    fadeFrame:Play()
+    fadeFill:Play()
+    fadeText:Play()
+    fadeBlur:Play()
+    fadeLogo:Play()
+    fadeSkip:Play()
+    
+    fadeFrame.Completed:Connect(function()
+        frame:Destroy()
+        fill:Destroy()
+        textLabel:Destroy()
+        blur:Destroy()
+        logo:Destroy()
+        skipButton:Destroy()
+        print("UI skipped")
+    end)
+    
+    -- Don't stop audio immediately when skipped - let it play for full 20 seconds
 end)
 
 -- Bubble animation function
@@ -200,7 +211,7 @@ local function Bubble()
     bubbleCorner.CornerRadius = UDim.new(0.5, 0)
     bubbleCorner.Parent = bubble
     bubble.Parent = frame
-    local tween = TweenService:Create(bubble, TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {
+    local tween = TweenService:Create(bubble, TweenInfo.new(2, Enum.EasingStyle.Sine), {
         Position = UDim2.new(bubble.Position.X.Scale, 0, -0.5, 0),
         BackgroundTransparency = 1
     })
