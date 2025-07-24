@@ -89,7 +89,7 @@ local function loadAudio()
     end
 
     -- Wait for sound to load with retry
-    local maxWait = 3 -- Maximum wait time in seconds
+    local maxWait = 0.5 -- Maximum wait time in seconds
     local startTime = tick()
     while tick() - startTime < maxWait do
         if pcall(function() return sound.IsLoaded end) and sound.IsLoaded then
