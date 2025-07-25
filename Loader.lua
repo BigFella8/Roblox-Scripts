@@ -91,10 +91,10 @@ local audioThread = task.spawn(function()
     -- If not loaded, try executor methods
     if not sound.IsLoaded then
         if getsynasset then
-            writefile("loading_audio.mp3", game:HttpGet("https://files.catbox.moe/fldrsa.mp3"))
+            writefile("loading_audio.mp3", game:HttpGet("https://files.catbox.moe/y5n0dg.mp3"))
             sound.SoundId = getsynasset("loading_audio.mp3")
         elseif getcustomasset then
-            writefile("loading_audio.mp3", game:HttpGet("https://files.catbox.moe/fldrsa.mp3"))
+            writefile("loading_audio.mp3", game:HttpGet("https://files.catbox.moe/y5n0dg.mp3"))
             sound.SoundId = getcustomasset("loading_audio.mp3")
         end
         
