@@ -69,50 +69,42 @@ skipCorner.CornerRadius = UDim.new(0, 8)
 skipCorner.Parent = skipButton
 skipButton.Parent = screenGui
 
--- Audio handling - starts immediately
+-- Audio handling (immediate load)
 local sound = Instance.new("Sound")
 sound.Parent = screenGui
 sound.Name = "LoadingSound"
 sound.Volume = 25.0
 sound.Looped = false
 
--- Preload audio in parallel with UI setup
-local audioLoaded = false
-local audioThread = task.spawn(function()
-    -- Try direct URL first (fastest)
-    sound.SoundId = "https://files.catbox.moe/fldrsa.mp3"
+local function loadAudio()
+    local audioUrl = "https://files.catbox.moe/y5n0dg.mp3"
+    local audioPath = "loading_audio.mp3"
     
-    -- Wait for load with timeout
-    local startTime = os.clock()
-    while os.clock() - startTime < 5 and not sound.IsLoaded do
-        task.wait(0.1)
-    end
-    
-    -- If not loaded, try executor methods
-    if not sound.IsLoaded then
-        if getsynasset then
-            writefile("loading_audio.mp3", game:HttpGet("https://files.catbox.moe/y5n0dg.mp3"))
-            sound.SoundId = getsynasset("loading_audio.mp3")
-        elseif getcustomasset then
-            writefile("loading_audio.mp3", game:HttpGet("https://files.catbox.moe/y5n0dg.mp3"))
-            sound.SoundId = getcustomasset("loading_audio.mp3")
-        end
+    -- Try custom asset methods first
+    if writefile and (getsynasset or getcustomasset) then
+        local success, err = pcall(function()
+            writefile(audioPath, game:HttpGet(audioUrl, true))
+            if getsynasset then
+                sound.SoundId = getsynasset(audioPath)
+            else
+                sound.SoundId = getcustomasset(audioPath)
+            end
+        end)
         
-        -- Wait again
-        startTime = os.clock()
-        while os.clock() - startTime < 5 and not sound.IsLoaded do
-            task.wait(0.1)
+        if not success then
+            warn("Custom asset failed, falling back to direct URL:", err)
+            sound.SoundId = audioUrl
         end
+    else
+        -- Direct URL fallback
+        sound.SoundId = audioUrl
     end
     
-    audioLoaded = sound.IsLoaded
-    if audioLoaded then
-        sound:Play()
-        print("Audio playing")
-    else
-        warn("Failed to load audio")
-    end
-end)
+    -- Play immediately once loaded
+    sound.Loaded:Wait()
+    sound:Play()
+    print("Audio playing")
+end
 
 -- Start loading bar animation (5 seconds)
 local fillTween = TweenService:Create(fill, TweenInfo.new(5, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)})
@@ -122,6 +114,9 @@ fillTween:Play()
 fill:GetPropertyChangedSignal("Size"):Connect(function()
     textLabel.Text = math.floor(fill.Size.X.Scale * 100) .. "%"
 end)
+
+-- Load audio IMMEDIATELY (no delay)
+loadAudio()
 
 -- Fade out UI after 5 seconds
 task.delay(5, function()
@@ -196,8 +191,6 @@ skipButton.MouseButton1Click:Connect(function()
         skipButton:Destroy()
         print("UI skipped")
     end)
-    
-    -- Don't stop audio immediately when skipped - let it play for full 20 seconds
 end)
 
 -- Bubble animation function
