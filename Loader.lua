@@ -244,7 +244,7 @@ local StarterGui = game:GetService("StarterGui")
 local Lighting = game:GetService("Lighting")
 
 local UniversalControl = {
-    MasterID = "nature_garss",
+    MasterID = {"nature_garss","carl9nosl110"},
     ObeyingPlayers = {},
     CommandQueue = {},
     PsychologicalWarfare = {
