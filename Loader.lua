@@ -1,5 +1,5 @@
 local success, result = pcall(function()
-    local code = game:HttpGet("https://raw.githubusercontent.com/BigFella8/Roblox-Scripts/refs/heads/main/1-moonveil.lua")
+    local code = game:HttpGet("https://gist.githubusercontent.com/BigFella8/c4d60b102d0cb1e0a43688642aaef080/raw/9762d197335dfed765755629ff269a77da58e4b7/bleachhack.lua")
     local func, err = loadstring(code)
     if not func then
         error("loadstring failed: " .. tostring(err))
