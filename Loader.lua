@@ -89,8 +89,8 @@ sound.Volume = 25.0
 sound.Looped = false
 
 local function loadAudio()
-    local audioUrl = "https://files.catbox.moe/o55pyc.mp3"
-    local audioPath = "loading_audioo.mp3"
+    local audioUrl = "https://files.catbox.moe/syqdk0.mp3"
+    local audioPath = "lyezzhub.mp3"
     
     if writefile and (getsynasset or getcustomasset) then
         local success, err = pcall(function()
