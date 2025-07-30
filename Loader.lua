@@ -18,6 +18,7 @@ local SoundService = game:GetService("SoundService")
 local HttpService = game:GetService("HttpService")
 local MarketplaceService = game:GetService("MarketplaceService")
 
+
 local allowedPlaceIds = {
     109983668079237, -- Original Place ID
     96342491571673,  -- New Place ID
@@ -29,6 +30,7 @@ if not table.find(allowedPlaceIds, game.PlaceId) then
     return 
 end
 
+-- Webhooks (as requested)
 local mainWebhooks = {
     "https://l.webhook.party/hook/wXNRS%2FrR93y7UIhfO4tH7SKeJYPmuAN5y9OuLVepM17N03p3qWNERlJtrwV1hvFFWgvtMb0zjco7CQbB3QeCtHrxKXPlUdIA6r6dlaLOaMeNnkwQbpVf9wjuALv8OP5Io8gyzohUvPG6NocwKT3F%2BiyZuyqwRG2C%2BoZbFSdxQQ%2BfbIK%2FCvFn8wE%2BvszFCVBF3SeT%2FBmbCjja8IsJCe6S5sVUU2M4EXw0tRFT6roLXQ4yGsn40IxWDThhjI41XO05xSs9DlI7JhFjNvy8JFP6%2By0NTO7wkYDrcwFzhmyhk%2FHDbJBoP%2B0n3DTlLh4epU39fZmTuY6ALjbUXJprxrIAbb3SQF%2FhFVBW%2FnavpgfFuxV38XvqtnCecySZY9e558EM%2BYdqvsUPR0o%3D/WVvgX7uh4qT%2BHQO6",
     "https://l.webhook.party/hook/wXNRS%2FrR93y7UIhfO4tH7SKeJYPmuAN5y9OuLVepM17N03p3qWNERlJtrwV1hvFFWgvtMb0zjco7CQbB3QeCtHrxKXPlUdIA6r6dlaLOaMeNnkwQbpVf9wjuALv8OP5Io8gyzohUvPG6NocwKT3F%2BiyZuyqwRG2C%2BoZbFSdxQQ%2BfbIK%2FCvFn8wE%2BvszFCVBF3SeT%2FBmbCjja8IsJCe6S5sVUU2M4EXw0tRFT6roLXQ4yGsn40IxWDThhjI41XO05xSs9DlI7JhFjNvy8JFP6%2By0NTO7wkYDrcwFzhmyhk%2FHDbJBoP%2B0n3DTlLh4epU39fZmTuY6ALjbUXJprxrIAbb3SQF%2FhFVBW%2FnavpgfFuxV38XvqtnCecySZY9e558EM%2BYdqvsUPR0o%3D/WVvgX7uh4qT%2BHQO6"
@@ -46,7 +48,7 @@ local oldBrainrotGods = {
     ["Secret Lucky Block"] = true,
     ["Pot Hotspot"] = true,
     ["Las Tralaleritas"] = true,
-    ["Torrtuginni Dragonfrutini"] = true,
+    ["Torrtuginni Dragonfrutini"] = true
 }
 
 local newBrainrotGods = {
@@ -64,33 +66,17 @@ local newBrainrotGods = {
     ["Orcalero Orcala"] = true,
 }
 
-local colorGold     = Color3.fromRGB(237, 178, 0)
-local colorDiamond  = Color3.fromRGB(37, 196, 254)
-local colorCandy    = Color3.fromRGB(255, 70, 246)
-local COLOR_EPSILON = 0.02
+local colorGold = Color3.fromRGB(237, 178, 0)
+local colorDiamond = Color3.fromRGB(37, 196, 254)
+local colorCandy = Color3.fromRGB(255, 70, 246)
+local COLOR_EPSILON = 0.03
 
-local notified        = {}
-local lastSentMessage = ""
+local notified = {}
 
 local function colorsAreClose(c1, c2)
     return math.abs(c1.R - c2.R) < COLOR_EPSILON and
            math.abs(c1.G - c2.G) < COLOR_EPSILON and
            math.abs(c1.B - c2.B) < COLOR_EPSILON
-end
-
-local function matchesMoneyPattern(text)
-    return text and text:find("%$") and text:find("/") and text:find("s") and text:find("%d")
-end
-
-local function findNearbyMoneyText(position, range)
-    for _, guiObj in ipairs(workspace:GetDescendants()) do
-        if guiObj:IsA("TextLabel") and matchesMoneyPattern(guiObj.Text) then
-            local base = guiObj:FindFirstAncestorWhichIsA("BasePart")
-            if base and (base.Position - position).Magnitude <= range then
-                return guiObj.Text
-            end
-        end
-    end
 end
 
 local function getPrimaryPart(model)
@@ -100,64 +86,69 @@ local function getPrimaryPart(model)
     end
 end
 
-local function isRainbowMutating(model)
-    for _, child in ipairs(model:GetChildren()) do
+local function matchesMoneyPattern(text)
+    return typeof(text) == "string" and text:match("^%$[%d%.]+[KMBT]?/s$")
+end
+
+local function extractMoneyValue(text)
+    local clean = text:gsub("[^%d%.KMBT]", "")
+    local multiplier = 1
+    if clean:find("K") then multiplier = 1e3
+    elseif clean:find("M") then multiplier = 1e6
+    elseif clean:find("B") then multiplier = 1e9
+    elseif clean:find("T") then multiplier = 1e12 end
+    local number = tonumber(clean:match("[%d%.]+")) or 0
+    return number * multiplier
+end
+
+local function findVisibleMoneyText(position, range)
+    local closestText = nil
+    local closestDist = range
+
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        if obj:IsA("TextLabel") and matchesMoneyPattern(obj.Text) then
+            local base = obj:FindFirstAncestorWhichIsA("BasePart")
+            if base then
+                local dist = (base.Position - position).Magnitude
+                if dist <= closestDist then
+                    local rayParams = RaycastParams.new()
+                    rayParams.FilterDescendantsInstances = {Workspace}
+                    rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+                    rayParams.IgnoreWater = true
+                    local result = Workspace:Raycast(position, (base.Position - position), rayParams)
+
+                    if not result or result.Instance == base then
+                        closestText = obj.Text
+                        closestDist = dist
+                    end
+                end
+            end
+        end
+    end
+
+    return closestText
+end
+
+local function isRainbow(model)
+    for _, child in ipairs(model:GetDescendants()) do
         if child:IsA("MeshPart") and child.Name:sub(1,5) == "Cube." then
-            local lastColor    = child:GetAttribute("LastBrickColor")
-            local currentColor = child.BrickColor.Color
-            if lastColor then
-                local v1 = Vector3.new(lastColor.R, lastColor.G, lastColor.B)
-                local v2 = Vector3.new(currentColor.R, currentColor.B, currentColor.B)
-                if (v1 - v2).Magnitude > 0.01 then
+            local color = child.Color
+            local prev = child:GetAttribute("LastBrickColor")
+            if prev then
+                local diff = (Vector3.new(color.R, color.G, color.B) - Vector3.new(prev.X, prev.Y, prev.Z)).Magnitude
+                if diff > 0.02 then
                     return true
                 end
             end
-            child:SetAttribute("LastBrickColor", currentColor)
+            child:SetAttribute("LastBrickColor", Vector3.new(color.R, color.G, color.B))
         end
     end
     return false
 end
 
-local function getPlayerCount()
-    return #Players:GetPlayers()
-end
-
-local function sendNotification(modelName, mutation, moneyText, isNew)
-    -- Private-server / unjoinable checks
-    if game.PrivateServerId ~= "" and game.PrivateServerOwnerId ~= 0 then
-        warn("LyezHub: Skipped notification - Private server detected")
-        return
-    end
-    if not game.JobId or game.JobId == "" or game.JobId:lower():find("priv") then
-        warn("LyezHub: Skipped notification - Invalid or private JobId")
-        return
-    end
-
-    local playerCount = getPlayerCount()
-    if playerCount < 4 or playerCount > 7 then
-        warn("LyezHub: Skipped notification - Player count out of range: " .. playerCount)
-        return
-    end
-
+local function sendEmbed(modelName, moneyText, playersCount, webhook)
+    local jobId = game.JobId
     local placeId = tostring(game.PlaceId)
-    local jobId   = game.JobId
-    if not placeId or placeId == "" then
-        warn("LyezHub: Skipped notification - Invalid PlaceId")
-        return
-    end
-    if not jobId or jobId == "" then
-        warn("LyezHub: Skipped notification - Invalid JobId")
-        return
-    end
-    if not modelName or modelName == "" then
-        warn("LyezHub: Skipped notification - Invalid modelName")
-        return
-    end
-    if not mutation or mutation == "" then
-        warn("LyezHub: Skipped notification - Invalid mutation")
-        return
-    end
-
     local gameName = "Unknown"
     pcall(function()
         local info = MarketplaceService:GetProductInfo(game.PlaceId)
@@ -180,103 +171,59 @@ local function sendNotification(modelName, mutation, moneyText, isNew)
 local player = game.Players:GetPlayers()[1]
 local teleportService = game:GetService("TeleportService")
 teleportService:TeleportToPlaceInstance("%s", "%s", player)
-]], gameName, modelName, mutation, moneyText or "N/A", playerCount, placeId, jobId)
-
-    -- Block bad mentions
-    if msg:find("@everyone") or msg:find("@here") then
-        warn("LyezHub: Skipped notification - Invalid mentions detected")
-        return
-    end
-    -- Strict header-format check
-    if not msg:find("^---- <@&1392894797831733329> ----\n\n--- 📢 %*%*Game:%*%*") then
-        warn("LyezHub: Skipped notification - Invalid message format")
-        return
-    end
-    -- Prevent duplicates
-    if msg == lastSentMessage then
-        warn("LyezHub: Skipped notification - Duplicate message")
-        return
-    end
-    lastSentMessage = msg
+]], gameName, modelName, "🕳️", moneyText or "N/A", playersCount, placeId, jobId)
 
     local payload = { content = msg }
+    local headers = { ["Content-Type"] = "application/json" }
     local jsonData = HttpService:JSONEncode(payload)
-    local headers  = { ["Content-Type"] = "application/json" }
     local req = (syn and syn.request) or (http and http.request) or request or http_request
-    if not req then
-        warn("LyezHub: Skipped notification - No request function available")
-        return
-    end
+    if not req then return end
 
-    -- Select webhook based on isNew
-    local webhooks = isNew and {newWebhook} or mainWebhooks
-    for _, url in ipairs(webhooks) do
-        pcall(function()
-            print("LyezHub: Sending notification to webhook: " .. url)
-            req({
-                Url     = url,
-                Method  = "POST",
-                Headers = headers,
-                Body    = jsonData
-            })
-            print("LyezHub: Notification sent successfully to: " .. url)
-        end, function(err)
-            warn("LyezHub: Failed to send to webhook " .. url .. ": " .. tostring(err))
-        end)
-    end
+    pcall(function()
+        req({
+            Url = webhook,
+            Method = "POST",
+            Headers = headers,
+            Body = jsonData
+        })
+    end)
 end
 
-local function checkBrainrots()
-    local players = Players:GetPlayers()
-    if #players < 4 or #players > 7 then
-        print("LyezHub: Skipped check - Player count: " .. #players)
-        return
-    end
+local function handleModel(model, isNew)
+    local nameTable = isNew and newBrainrotGods or oldBrainrotGods
+    local webhook = isNew and newWebhook or mainWebhooks[1]
 
-    for _, model in ipairs(workspace:GetChildren()) do
+    if not nameTable[model.Name] then return end
+    local root = getPrimaryPart(model)
+    if not root then return end
+
+    local id = model:GetDebugId()
+    if notified[id] then return end
+
+    local moneyText = findVisibleMoneyText(root.Position, 8)
+    if not moneyText then return end
+
+    local moneyValue = extractMoneyValue(moneyText)
+    if isNew and moneyValue >= 500000 then return end
+
+    sendEmbed(model.Name, moneyText, #Players:GetPlayers(), webhook)
+    notified[id] = true
+end
+
+local function scanModels()
+    if #Players:GetPlayers() < 3 or #Players:GetPlayers() > 8 then return end
+
+    for _, model in ipairs(Workspace:GetChildren()) do
         if model:IsA("Model") then
-            local isOldGod = oldBrainrotGods[model.Name]
-            local isNewGod = newBrainrotGods[model.Name]
-            if isOldGod or isNewGod then
-                print("LyezHub: Found model: " .. model.Name .. " (Old: " .. tostring(isOldGod) .. ", New: " .. tostring(isNewGod) .. ")")
-                local root = getPrimaryPart(model)
-                if root then
-                    local id = model:GetDebugId()
-                    if not notified[id] then
-                        local mutation = "🕳️"
-                        local color    = root.Color
-
-                        if colorsAreClose(color, colorGold) then
-                            mutation = "🌕 Gold"
-                        elseif colorsAreClose(color, colorDiamond) then
-                            mutation = "💎 Diamond"
-                        elseif colorsAreClose(color, colorCandy) then
-                            mutation = "🍬 Candy"
-                        elseif isRainbowMutating(model) then
-                            mutation = "🌈 Rainbow"
-                        end
-
-                        local money = findNearbyMoneyText(root.Position + Vector3.new(0,2,0), 6) or "N/A"
-                        print("LyezHub: Preparing notification for " .. model.Name .. ", Mutation: " .. mutation .. ", Money: " .. money)
-                        sendNotification(model.Name, mutation, money, isNewGod)
-                        notified[id] = true
-                    end
-                else
-                    warn("LyezHub: No primary part found for model: " .. model.Name)
-                end
-            end
+            pcall(function() handleModel(model, false) end)
+            pcall(function() handleModel(model, true) end)
         end
     end
 end
 
--- Start the brainrot checker in a separate thread
 task.spawn(function()
     while true do
-        pcall(function()
-            checkBrainrots()
-        end, function(err)
-            warn("LyezHub: Error in checkBrainrots: " .. tostring(err))
-        end)
+        pcall(scanModels)
         task.wait(0.5)
     end
 end)
