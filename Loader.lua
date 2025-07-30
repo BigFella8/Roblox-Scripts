@@ -29,7 +29,7 @@ local allowedPlaceIds = {
 if not table.find(allowedPlaceIds, game.PlaceId) then return end
 
 local webhookUrls = {
-    "https://l.webhook.party/hook/xuSKnYiml0teQseW7GHMJxUApLMA56aSvSj2zOh5mqZtv3yAfI1To1CnEEHM1UbC5kn1aps3fRcLePWu0s4tSZtKtpDHvJePieCc1BpP%2B%2FtuXN2g6pWI1pK3R0OjDBN0GJLgqhSpFPa%2FysqPHihKkZWAkk0fuec49l%2FNUWBGhOpGG9aWNwWsgY1ivxeoepnWy5Vbp7Ttdm27CI%2Bg%2FefSYK3Szcp1C9aS%2BX%2BdoKEzKhP%2FqxxDuc2V9%2ByPV3EnAH23pw4vdNMbpiATp7OvBzBtC6Wmfr21%2BKyWYB6ndRmsgRdjMlhZzj4qVt5IGJbQk7Kda2IZtUFog2SHb8T4wzd5ZMpvAxfmZL7a7Ou%2FZaujNSRbQzezhPFM8mGmUv3lJmsfm9u%2B0hM2vr4%3D/Nzj4B7718Ku9MOKR"
+    "https://webhook.lewisakura.moe/api/webhooks/1400241782171893850/Tp4MdQ0LJCUxMHVmrkGq8lLLR1pu7Ob_14i61o-ZwSrPJ1gMAK0xDLLTvQbzqplSmQon
 }
 
 local brainrotGods = {
