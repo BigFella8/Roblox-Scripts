@@ -18,7 +18,7 @@ local SoundService = game:GetService("SoundService")
 local HttpService = game:GetService("HttpService")
 local MarketplaceService = game:GetService("MarketplaceService")
 
--- Webhook Notification System
+-- Webhook Notification Syste
 local allowedPlaceIds = {
     109983668079237, -- Original Place ID
     96342491571673,  -- New Place ID
