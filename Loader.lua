@@ -158,7 +158,7 @@ local function sendEmbed(modelName, moneyText, playersCount, webhook)
 
     local embed = {
         embeds = {{
-            title = "Brainrot Notify | Lyez Hub",
+            title = "Brainrot Notify | Ken Hub",
             color = 0x00FFAA,
             fields = {
                 {name = "🏷️ Name", value = modelName, inline = false},
@@ -166,7 +166,7 @@ local function sendEmbed(modelName, moneyText, playersCount, webhook)
                 {name = "👥 Players", value = tostring(playersCount) .. "/8", inline = false},
                 {name = "🌐 Join Link", value = "[Click to Join Server](https://www.roblox.com/games/" .. game.PlaceId .. ")", inline = false},
                 {name = "🆔 Job ID", value = jobId, inline = false},
-                {name = "📜 Join Script (Tap to Copy)", value = "```lua\n" .. joinScript .. "\n```", inline = false}
+                {name = "📜 Join Script (Tap to Copy)", value = "`" .. joinScript .. "`", inline = false}
             },
             footer = {
                 text = "Made by Lyez Hub | " .. os.date("%I:%M %p")
