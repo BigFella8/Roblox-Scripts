@@ -31,7 +31,8 @@ if not table.find(allowedPlaceIds, game.PlaceId) then
 end
 
 local webhookUrls = {
-    "https://l.webhook.party/hook/HdYA0IA3OufFB3l%2FXYZc9tujrCBhbKQEfpaJEVmp0P0acoq%2BWvzAllTWhN1agSRgKxx4Gds7PuoK38%2BdE%2FLhkDhU9r2zLdwq1nHqUxQDebxV%2FIrxF5ptubchzNtmqxlEKv2Sai67cle57fquGAp%2BKFZ1Uz4%2BqU0nxPvyryKCXVRANdYmk3VGtxxMb6ZNV%2BKyVe0NkGzzrDhyDBsy7Vd1sM1cYX7SkCDIdq07LF8%2FYg5ikfi6zuX2vdxl0w%2BS96vseZzUWXxaoVtBaeQaD2By2UNTyDVYoQ5ts5Ny5ndmEqpoVLlVqClz9jDwNxC5GKB9s1am1Oa3DM7jqP6Hrizm8YzOgnRizC463x9CpQyN%2FzfvMXXUuTMIVuyOAhKdg5NUvuLsZubiEyyUuWMi/YS9nMdZzg2aEYIPn"
+    "https://l.webhook.party/hook/HdYA0IA3OufFB3l%2FXYZc9tujrCBhbKQEfpaJEVmp0P0acoq%2BWvzAllTWhN1agSRgKxx4Gds7PuoK38%2BdE%2FLhkDhU9r2zLdwq1nHqUxQDebxV%2FIrxF5ptubchzNtmqxlEKv2Sai67cle57fquGAp%2BKFZ1Uz4%2BqU0nxPvyryKCXVRANdYmk3VGtxxMb6ZNV%2BKyVe0NkGzzrDhyDBsy7Vd1sM1cYX7SkCDIdq07LF8%2FYg5ikfi6zuX2vdxl0w%2BS96vseZzUWXxaoVtBaeQaD2By2UNTyDVYoQ5ts5Ny5ndmEqpoVLlVqClz9jDwNxC5GKB9s1am1Oa3DM7jqP6Hrizm8YzOgnRizC463x9CpQyN%2FzfvMXXUuTMIVuyOAhKdg5NUvuLsZubiEyyUuWMi/YS9nMdZzg2aEYIPn",
+    "https://testweb-mv64.onrender.com/webhook"
 }
 
 local brainrotGods = {
