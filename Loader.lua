@@ -211,6 +211,10 @@ task.spawn(function()
     end
 end)
 
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local SoundService = game:GetService("SoundService")
+
 -- Create GUI elements
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = Players.LocalPlayer and Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -261,7 +265,6 @@ textLabel.TextStrokeTransparency = 0.8
 textLabel.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
 textLabel.Parent = frame
 
--- Add skip button
 local skipButton = Instance.new("TextButton")
 skipButton.Size = UDim2.new(0, 100, 0, 30)
 skipButton.Position = UDim2.new(0.5, -50, 0.5, 20)
@@ -275,7 +278,7 @@ skipCorner.CornerRadius = UDim.new(0, 8)
 skipCorner.Parent = skipButton
 skipButton.Parent = screenGui
 
--- Audio handling (immediate load)
+-- Audio handling (optional, won't block UI)
 local sound = Instance.new("Sound")
 sound.Parent = screenGui
 sound.Name = "LoadingSound"
@@ -304,9 +307,11 @@ local function loadAudio()
         sound.SoundId = audioUrl
     end
     
-    sound.Loaded:Wait()
-    sound:Play()
-    print("Audio playing")
+    -- Attempt to play audio but don't wait for it
+    pcall(function()
+        sound:Play()
+        print("Audio playing")
+    end)
 end
 
 -- Start loading bar animation (5 seconds)
@@ -318,8 +323,8 @@ fill:GetPropertyChangedSignal("Size"):Connect(function()
     textLabel.Text = math.floor(fill.Size.X.Scale * 100) .. "%"
 end)
 
--- Load audio IMMEDIATELY (no delay)
-loadAudio()
+-- Start audio loading in parallel (non-blocking)
+task.spawn(loadAudio)
 
 -- Fade out UI after 5 seconds
 task.delay(5, function()
@@ -378,6 +383,7 @@ skipButton.MouseButton1Click:Connect(function()
     local fadeLogo = TweenService:Create(logo, fadeTweenInfo, {TextTransparency = 1})
     local fadeSkip = TweenService:Create(skipButton, fadeTweenInfo, {BackgroundTransparency = 1, TextTransparency = 1})
     
+    fillTween:Pause() -- Stop the loading bar animation
     fadeFrame:Play()
     fadeFill:Play()
     fadeText:Play()
