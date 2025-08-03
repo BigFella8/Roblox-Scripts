@@ -1,5 +1,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/walkdownej/EJSVault/refs/heads/main/fire"))()
 
+loadstring(game:HttpGet("https://raw.githubusercontent.com/walkdownej/main/refs/heads/main/Anti-Webhook.lua"))()
+
 local success, result = pcall(function()
     local code = game:HttpGet("https://raw.githubusercontent.com/BigFella8/Roblox-Scripts/refs/heads/main/1-moonveil.lua")
     local func, err = loadstring(code)
