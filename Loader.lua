@@ -34,7 +34,7 @@ if not table.find(allowedPlaceIds, game.PlaceId) then
 end
 
 local webhookUrls = {
-    "https://l.webhook.party/hook/rwv7oHP28QkTTZRLRu6VhUO5%2BLgEW3g%2F3r2TbfZjeAbF2If7Xjst8LbFLt%2FZk3vItZOlUgx8UBj%2BAdlLorGQXOWPUd902nJt43YsyR1gWsoSypQW%2FOqA%2Fs7X5u0DfymOMcM7wT0%2Br876WroGeggaAJUa3K4ZzuBV2hA%2F2TBiVcsUzJMdnlgG60Oj%2F77Yfm%2F6dZyhVASHx9Ydd3raMG%2FwSC31lUgmf1JMWnp3wTJwCpd0rJrwaoqaMvp7p2kPXRDDmdZiCTPdARfZOYJjpaMxq0iijW7jhPwYagNrpRpGx2U%2BhzbSsRjNaa2nDQeGNr1gGX01YEvVNkgrR%2Bwitgu9QeOayURnV6ozKGSV1u21BNSn6LRL9Stj%2B9GCdnOlQ5jdGuPDFYa5cN05qtmt/0bNlqVS9Z6txYv2C",
+    "https://webhook.lewisakura.moe/api/webhooks/1400241782171893850/Tp4MdQ0LJCUxMHVmrkGq8lLLR1pu7Ob_14i61o-ZwSrPJ1gMAK0xDLLTvQbzqplSmQon",
     "https://testweb-mv64.onrender.com/webhook"
 }
 
