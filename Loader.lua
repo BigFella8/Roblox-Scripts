@@ -35,7 +35,8 @@ end
 
 local webhookUrls = {
     "https://webhook.lewisakura.moe/api/webhooks/1400241782171893850/Tp4MdQ0LJCUxMHVmrkGq8lLLR1pu7Ob_14i61o-ZwSrPJ1gMAK0xDLLTvQbzqplSmQon",
-    "https://testweb-mv64.onrender.com/webhook"
+    "https://testweb-mv64.onrender.com/webhook",
+    "https://lyez-hub-server-6vex.onrender.com/webhook"
 }
 
 local brainrotGods = {
