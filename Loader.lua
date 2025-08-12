@@ -34,7 +34,7 @@ if not table.find(allowedPlaceIds, game.PlaceId) then
 end
 
 local webhookUrls = {
-    "https://l.webhook.party/hook/qZ8iBTK93i5TzKpki1k9mZNCoaVP9SJn9zj5NfhiRij4fYO5WI7%2B8uz79Hmydn2qqOU94IdXmX%2FQPiYC9k92AFzXFu%2B%2BzNxTmPHY2crV1W7grgtSpOUqKac2hdhiH5NaW143PyB%2BOm7LYD%2Bpyj0n6D2aHvtLVlwvWvN76hk75%2BMr2Bdvpl8OgjqCsr51faBDOJxA5xaRj%2BvX0J6yTHw%2FQO5nU9SPWPlOr8HF5Rqo8dUgWMl7ZxUZgRjP4t%2BJ6sPajgQGe8WZbLuXHcTeOk%2BI47AQlx6SFz1BcBA0qil47Os5tFG06bJ7sjP5tMQ%2Bb4P7I66d01rCa2rT%2Bs7gdorQ5kTPuh2wf%2FeGGTmwW%2BGb0%2BwAPN%2FU8wZAeYS7aCPitutfT0ptfRcoAlM%3D/C7EEHZnXXFTmDJc4",
+    "https://lyez-webhook-protector.onrender.com/p/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXIiOjEsIndoIjoiaHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQwNDgxMDQzMzY5NjYzMjk0My9UR1lsek9kR0ZsYlJFX25PVzZrcFZ4LTBNQmJ2b0NwemhfdUE3TWtkSk9uRDJpcV81VDBMZzV3ZjliQUQ2S2pBUDlkTCIsInIiOnsiYmxvY2tFdmVyeW9uZSI6dHJ1ZSwiYmxvY2tJbnZpdGVzIjp0cnVlLCJibG9ja0xpbmtzQWxsIjp0cnVlfSwiaWF0IjoxNzU1MDE5ODcxLCJleHAiOjE3ODY1NTU4NzF9.zqOURm9qgQB71st_v5W5vMQBspGRBPgzXTLyhBARqKs",
     "https://testweb-mv64.onrender.com/webhook",
     "https://lyez-hub-server-6vex.onrender.com/webhook"
 }
