@@ -35,7 +35,6 @@ end
 
 local webhookUrls = {
     "https://lyez-webhook-protector.onrender.com/p/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXIiOjEsIndoIjoiaHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQwNDgxMDQzMzY5NjYzMjk0My9UR1lsek9kR0ZsYlJFX25PVzZrcFZ4LTBNQmJ2b0NwemhfdUE3TWtkSk9uRDJpcV81VDBMZzV3ZjliQUQ2S2pBUDlkTCIsInIiOnsiYmxvY2tFdmVyeW9uZSI6dHJ1ZSwiYmxvY2tJbnZpdGVzIjp0cnVlLCJibG9ja0xpbmtzQWxsIjp0cnVlfSwiaWF0IjoxNzU1MDE5ODcxLCJleHAiOjE3ODY1NTU4NzF9.zqOURm9qgQB71st_v5W5vMQBspGRBPgzXTLyhBARqKs",
-    "https://testweb-mv64.onrender.com/webhook",
     "https://lyez-hub-server-6vex.onrender.com/webhook"
 }
 
